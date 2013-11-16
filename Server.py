@@ -20,6 +20,7 @@ def index():
 
 
 def is_valid_token(access_token):
+    # Todo: 내부에서 액세스토큰 생성하는 로직 필요
     """
     this is a method to validate access token.
     :param access_token: the access token which is sent by client.
@@ -43,8 +44,9 @@ def ask_for_sth():
 
     order = request.args.get('order')
     if order == 'picture':
-    # Todo:카메라 모듈로 사진 촬영 요청 그리고 이미지 경로 받아서 리턴
-        return jsonify({'picture': 'you ask for the current photograph'})
+    # Todo:카메라 모듈로 사진 촬영 요청
+        import getUrl
+        return jsonify({'picture': '%s' % getUrl.getURL()})
     elif order == 'movie':
     # Todo:동영상 촬영 및 스트리밍 주소 리턴
         return jsonify({'result': 'you ask for the current movie'})
@@ -66,19 +68,6 @@ def validatePW():
         return jsonify({'result': 'Valid Password'})
     else:
         return jsonify({'result': 'Invalid Password'})
-
-@app.route('/file')
-def file():
-    return getFilePath()
-
-
-def getFilePath():
-    """
-    this is a method to get specific file path.
-    :return: file path
-    """
-
-    return 'http://127.0.0.1' + '/static/' + 'sample.jpg'
 
 
 if __name__ == '__main__':
