@@ -51,6 +51,15 @@ def ask_for_sth():
     # Todo:동영상 촬영 및 스트리밍 주소 리턴
         return jsonify({'result': 'you ask for the current movie'})
 
+
+def get_encrypted_pw():
+    import hashlib
+
+    pw = hashlib.md5()
+    pw.update("secret")
+    return pw.digest()
+
+
 @app.route('/login', methods=['POST'])
 def validatePW():
     """
@@ -58,13 +67,10 @@ def validatePW():
     :return: access_token
     """
     password = request.args.get('passwd')
-    # import hashlib
-    # pw = hashlib.md5()
-    # pw.update("secret")
-    # pw.digest()
+    encrypted_pw = get_encrypted_pw()
     # Todo : 외부에서 설정한 패스워드로 지정
     # Todo : 액세스 토큰 생성해서 전달하도록 구현
-    if password == 'secret':
+    if password == encrypted_pw:
         return jsonify({'result': 'Valid Password'})
     else:
         return jsonify({'result': 'Invalid Password'})
