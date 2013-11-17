@@ -22,7 +22,7 @@ def index():
 def is_valid_token(access_token):
     # Todo: 내부에서 액세스토큰 생성하는 로직 필요
     """
-    this is a method to validate access token.
+    This is a method to validate access token.
     :param access_token: the access token which is sent by client.
     :return: True or False
     """
@@ -60,6 +60,16 @@ def get_encrypted_pw():
     return pw.digest()
 
 
+def create_access_token():
+    """
+    This is a method to create an access token for request
+    :return: access_token
+    """
+    # Todo : 서버가 실행될 때 무작위적으로 액세스토큰을 만드는 로직이 필요 ; 현재 일시적으로 'accessToken' 문자열 리턴
+    # Todo : 만든 액세스토큰은 서버 내에서 변수로 저장해야 함
+    return 'accessToken'
+
+
 @app.route('/login', methods=['POST'])
 def validatePW():
     """
@@ -71,7 +81,7 @@ def validatePW():
     # Todo : 외부에서 설정한 패스워드로 지정
     # Todo : 액세스 토큰 생성해서 전달하도록 구현
     if password == encrypted_pw:
-        return jsonify({'result': 'Valid Password'})
+        return jsonify({'result': '%s' % create_access_token()})
     else:
         return jsonify({'result': 'Invalid Password'})
 
