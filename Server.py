@@ -1,13 +1,8 @@
 # coding=utf-8
+from multiprocessing import Process
 from flask import Flask, request, jsonify, url_for, redirect
 
 app = Flask(__name__)
-
-# class NetworkMng:
-#     def __init__(self, passwd):
-#         self.passwd = passwd
-#     def getPasswd(self):
-#         return self.passwd
 
 # Login with password
 @app.route('/')
@@ -45,8 +40,7 @@ def ask_for_sth():
     order = request.args.get('order')
     if order == 'picture':
     # Todo:카메라 모듈로 사진 촬영 요청
-        import getUrl
-        return jsonify({'picture': '%s' % getUrl.getURL()})
+        return jsonify({'result': '/image.jpg'})    # 임시 URL 반환.
     elif order == 'movie':
     # Todo:동영상 촬영 및 스트리밍 주소 리턴
         return jsonify({'result': 'you ask for the current movie'})
@@ -57,6 +51,7 @@ def get_encrypted_pw():
 
     pw = hashlib.md5()
     pw.update("secret")
+    print pw.digest()
     return pw.digest()
 
 
@@ -70,21 +65,25 @@ def create_access_token():
     return 'accessToken'
 
 
-@app.route('/login', methods=['POST'])
+@app.route('/login', methods=['POST', 'GET'])
 def validatePW():
     """
     클라이언트에서 로그인 요청 시 패스워드 유효 판단 및 액세스 토큰 전달.
     :return: access_token
     """
     password = request.args.get('passwd')
-    encrypted_pw = get_encrypted_pw()
+    # encrypted_pw = get_encrypted_pw()
     # Todo : 외부에서 설정한 패스워드로 지정
-    # Todo : 액세스 토큰 생성해서 전달하도록 구현
-    if password == encrypted_pw:
+    # Todo : 패스워드가 맞아도 로직이 제대로 작동 안하는 것 해결
+    if password == '1234':
         return jsonify({'result': '%s' % create_access_token()})
     else:
         return jsonify({'result': 'Invalid Password'})
 
+
+import loop_module
+p = Process(target=loop_module.loop, args=())
+p.start()
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
