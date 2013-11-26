@@ -35,7 +35,7 @@ class NetworkManager(object):
 
     def __init__(self, passwd):
         self.password = passwd
-        self.access_token = get_access_token()
+        self.access_token = self.get_access_token()
 
     @classmethod
     def name(cls):
@@ -46,6 +46,39 @@ class NetworkManager(object):
 
     def getAccessToken(self):
         return self.access_token
+
+    def is_valid_token(self, atoken):
+    # Todo: 내부에서 액세스토큰 생성하는 로직 필요
+        """
+        This is a method to validate access token.
+        :param atoken: the access token which is sent by client.
+        :return: True or False
+        """
+        if atoken == self.getAccessToken():
+            return True
+        else:
+            return False
+
+    # def encrypt_pw(self, pw):
+    #     """
+    #     This is a method to encrypt password.
+    #     :param pw: assigned password.
+    #     :return: encrypted password.
+    #     """
+    #     import hashlib
+    #     pw = hashlib.md5()
+    #     pw.update(x.getPassword())
+    #     return pw.digest()
+
+    def get_access_token(self):
+        """
+        This is a method to create an access token for request
+        :rtype : str
+        :return: access_token
+        """
+        # Todo : 서버가 실행될 때 무작위적으로 액세스토큰을 만드는 로직이 필요 ; 현재 일시적으로 'accessToken' 문자열 리턴
+        # Todo : 만든 액세스토큰은 서버 내에서 변수로 저장해야 함
+        return 'accessToken'
 
 
 # Login with password
@@ -59,19 +92,6 @@ def index():
     return redirect(url_for('hello_world'))
 
 
-def is_valid_token(access_token):
-    # Todo: 내부에서 액세스토큰 생성하는 로직 필요
-    """
-    This is a method to validate access token.
-    :param access_token: the access token which is sent by client.
-    :return: True or False
-    """
-    if access_token == 'accessToken':
-        return True
-    else:
-        return False
-
-
 @app.route('/askfor', methods=['POST', 'GET'])
 def ask_for_sth():
     """
@@ -79,35 +99,16 @@ def ask_for_sth():
     :return: image path or stream address
     """
     access_token = request.args.get('accessToken')
-    if not is_valid_token(access_token):
+    if not x.is_valid_token(access_token):
         return jsonify({'result': 'you have invalid access token'})
 
     order = request.args.get('order')
+    import camera   # 카메라 모듈 임포트.
     if order == 'picture':
-    # Todo:카메라 모듈로 사진 촬영 요청
-        return jsonify({'result': '/image.jpg'})    # 임시 URL 반환.
+        return jsonify({'result': '%s' % camera.camera_execute()})
     elif order == 'movie':
-    # Todo:동영상 촬영 및 스트리밍 주소 리턴
-        return jsonify({'result': 'you ask for the current movie'})
-
-
-def get_encrypted_pw():
-    import hashlib
-
-    pw = hashlib.md5()
-    pw.update(x.getPassword())
-    return pw.digest()
-
-
-def get_access_token():
-    """
-    This is a method to create an access token for request
-    :rtype : str
-    :return: access_token
-    """
-    # Todo : 서버가 실행될 때 무작위적으로 액세스토큰을 만드는 로직이 필요 ; 현재 일시적으로 'accessToken' 문자열 리턴
-    # Todo : 만든 액세스토큰은 서버 내에서 변수로 저장해야 함
-    return 'accessToken'
+        camera.view_stream()
+        return jsonify({'result': 'rtsp://192.168.0.4:8554/'})
 
 
 @app.route('/login', methods=['POST', 'GET'])
@@ -123,7 +124,7 @@ def validatePW():
     # access_token = get_access_token()
     atoken = x.getAccessToken()
     if password == '1234':
-        return jsonify({'result': '1234'})
+        return jsonify({'result': '1234 %s' % atoken})
     else:
         return jsonify({'result': 'Invalid Password'})
 
