@@ -59,16 +59,17 @@ class NetworkManager(object):
         else:
             return False
 
-    # def encrypt_pw(self, pw):
-    #     """
-    #     This is a method to encrypt password.
-    #     :param pw: assigned password.
-    #     :return: encrypted password.
-    #     """
-    #     import hashlib
-    #     pw = hashlib.md5()
-    #     pw.update(x.getPassword())
-    #     return pw.digest()
+    def encrypt_pw(self):
+        """
+        This is a method to encrypt password.
+        :param pw: assigned password.
+        :return: encrypted password.
+        """
+        import hashlib
+        pw = hashlib.md5()
+        pw.update(self.password)
+        result = pw.hexdigest()
+        return result
 
     def get_access_token(self):
         """
@@ -104,12 +105,14 @@ def ask_for_sth():
 
     order = request.args.get('order')
     import camera   # 카메라 모듈 임포트.
+
     if order == 'picture':
         return jsonify({'result': '%s' % camera.camera_execute()})
     elif order == 'movie':
         p2 = Process(target=camera.view_stream, args=())
-	p2.start()
-        return jsonify({'result': 'rtsp://119.197.164.6:8554/'})
+        p2.start()
+
+        return jsonify({'result': 'rtsp://' + get_ip.get_ip_address('eth0') + ':8554/'})
 
 
 @app.route('/login', methods=['POST', 'GET'])
@@ -118,23 +121,22 @@ def validatePW():
     클라이언트에서 로그인 요청 시 패스워드 유효 판단 및 액세스 토큰 전달.
     :return: access_token
     """
-    password = request.args.get('passwd')
-    # encrypted_pw = get_encrypted_pw()
+    password = request.values.get('passwd')
     # Todo : 외부에서 설정한 패스워드로 지정
-
-    # access_token = get_access_token()
-    atoken = x.getAccessToken()
-    if password == '1234':
-        return jsonify({'result': '1234 %s' % atoken})
+    print password
+    if password == x.encrypt_pw():
+        atoken = x.getAccessToken()
+        return jsonify({'result': '%s' % atoken})
     else:
-        return jsonify({'result': 'Invalid Password'})
-
-
+        return jsonify({'result': 'Invalid Password %s' % password})
 
 
 if __name__ == '__main__':
-    x = NetworkManager(1234)
+    import sys
+    sys.path.append("/home/pi/Hardware_Module/Hardware")
     import pir_sensor
+
+    x = NetworkManager('1234')
     p = Process(target=pir_sensor.sensoring, args=())
     p.start()
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000, debug=True)
