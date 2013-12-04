@@ -107,8 +107,9 @@ def ask_for_sth():
     if order == 'picture':
         return jsonify({'result': '%s' % camera.camera_execute()})
     elif order == 'movie':
-        camera.view_stream()
-        return jsonify({'result': 'rtsp://192.168.0.4:8554/'})
+        p2 = Process(target=camera.view_stream, args=())
+	p2.start()
+        return jsonify({'result': 'rtsp://119.197.164.6:8554/'})
 
 
 @app.route('/login', methods=['POST', 'GET'])
@@ -129,14 +130,11 @@ def validatePW():
         return jsonify({'result': 'Invalid Password'})
 
 
-import loop_module
 
-p = Process(target=loop_module.loop, args=())
-p.start()
 
 if __name__ == '__main__':
     x = NetworkManager(1234)
-    x.name()
-    print x.getAccessToken()
-    print x.getPassword()
-    app.run(host='0.0.0.0')
+    import pir_sensor
+    p = Process(target=pir_sensor.sensoring, args=())
+    p.start()
+    app.run(host='0.0.0.0', port=5000)
