@@ -1,6 +1,7 @@
 # coding=utf-8
 from multiprocessing import Process
 from flask import Flask, request, jsonify, url_for, redirect
+import random
 
 app = Flask(__name__)
 
@@ -32,10 +33,11 @@ class NetworkManager(object):
     """
     password = ''
     access_token = ''
+    jobs = {}
 
     def __init__(self, passwd):
         self.password = passwd
-        self.access_token = self.get_access_token()
+        self.access_token = self.create_access_token()
 
     @classmethod
     def name(cls):
@@ -71,16 +73,27 @@ class NetworkManager(object):
         result = pw.hexdigest()
         return result
 
-    def get_access_token(self):
+    def create_access_token(self):
         """
         This is a method to create an access token for request
         :rtype : str
         :return: access_token
         """
-        # Todo : 서버가 실행될 때 무작위적으로 액세스토큰을 만드는 로직이 필요 ; 현재 일시적으로 'accessToken' 문자열 리턴
-        # Todo : 만든 액세스토큰은 서버 내에서 변수로 저장해야 함
-        return 'accessToken'
+        randstr = ['a', 'b', 'c', 'd', 'e', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'e', 'l', 'm', 'o']
+        accesstkn = '%s%d%s%d' % (random.choice(randstr), random.randint(1, 10), random.choice(randstr), random.randint(1, 10))
+        print accesstkn
+        return accesstkn
 
+    def set_proc_dic(self, pname, proc):
+        self.jobs.update({pname: proc})
+
+    def get_proc_dic(self):
+        return self.jobs
+
+    def terminate_proc(self, pname):
+        if not pname == 'streaming' or pname == 'sensoring':
+            self.jobs[pname].terminate()
+            del self.jobs[pname]
 
 # Login with password
 @app.route('/')
@@ -111,8 +124,26 @@ def ask_for_sth():
     elif order == 'movie':
         p2 = Process(target=camera.view_stream, args=())
         p2.start()
-
+        x.set_proc_dic('streaming', p2)
+        import get_ip
         return jsonify({'result': 'rtsp://' + get_ip.get_ip_address('eth0') + ':8554/'})
+
+@app.route('/suspend', methods=['GET'])
+def suspend_sth():
+    access_token = request.args.get('accessToken')
+    if not x.is_valid_token(access_token):
+        return jsonify({'result': 'you have invalid access token'})
+
+    order = request.args.get('order')
+    print '1234'
+    if order == 'sensor' and 'sensor' in x.get_proc_dic():
+        x.terminate_proc('sensor')
+        return jsonify({'result': 'Sensoring suspended'})
+    elif order == 'streaming' and 'streaming' in x.get_proc_dic():
+        x.terminate_proc('streaming')
+        return jsonify({'result': 'Streaming suspended'})
+    else:
+        return jsonify({'result': 'Invalid request'})
 
 
 @app.route('/login', methods=['POST', 'GET'])
@@ -137,6 +168,8 @@ if __name__ == '__main__':
     import pir_sensor
 
     x = NetworkManager('1234')
-    p = Process(target=pir_sensor.sensoring, args=())
-    p.start()
+    # p = Process(target=pir_sensor.sensoring, args=())
+    # p.start()
+    # x.set_proc_dic('sensoring', p)
+
     app.run(host='0.0.0.0', port=5000, debug=True)
