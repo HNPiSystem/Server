@@ -35,8 +35,8 @@ class NetworkManager(object):
     access_token = ''
     jobs = {}
 
-    def __init__(self, passwd):
-        self.password = passwd
+    def __init__(self):
+        self.password = self.read_password()
         self.access_token = self.create_access_token()
 
     @classmethod
@@ -60,6 +60,18 @@ class NetworkManager(object):
             return True
         else:
             return False
+
+    def write_password(self, pw):
+	f = file('dat', 'w+')
+	f.write(pw)
+	f.close()
+
+    def read_password(self):
+	f = file('dat')
+	s = f.read(4)
+	f.close()
+	print s
+	return s
 
     def encrypt_pw(self):
         """
@@ -135,7 +147,6 @@ def suspend_sth():
         return jsonify({'result': 'you have invalid access token'})
 
     order = request.args.get('order')
-    print '1234'
     if order == 'sensor' and 'sensor' in x.get_proc_dic():
         x.terminate_proc('sensor')
         return jsonify({'result': 'Sensoring suspended'})
@@ -167,7 +178,7 @@ if __name__ == '__main__':
     sys.path.append("/home/pi/Hardware_Module/Hardware")
     import pir_sensor
 
-    x = NetworkManager('1234')
+    x = NetworkManager()
     # p = Process(target=pir_sensor.sensoring, args=())
     # p.start()
     # x.set_proc_dic('sensoring', p)
