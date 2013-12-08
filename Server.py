@@ -27,17 +27,32 @@ def ask_for_sth():
         return jsonify({'result': 'you have invalid access token'})
 
     order = request.args.get('order')
-    import camera   # 카메라 모듈 임포트.
 
-    if order == 'picture':
-        return jsonify({'result': '%s' % camera.camera_execute()})
-    elif order == 'movie':
-        p2 = Process(target=camera.view_stream, args=())
+    if order == 'movie':
+        p = Process(target=hdManager.ask_streaming(), args=())
+        p.start()
+        p2 = Process(target=hdManager.ask_pir_sensor(), args=())
         p2.start()
-        netManager.set_proc_dic('streaming', p2)
+        # netManager.set_proc_dic('streaming', p2)
         import get_ip
 
         return jsonify({'result': 'rtsp://' + get_ip.get_ip_address('eth0') + ':8554/'})
+
+    elif order == 'therm':
+        # 현재 온도 체크해서 보내 줌.
+        return jsonify({'result': hdManager.ask_thermo_sensor()})
+
+    elif order == 'light_auto':
+        # Todo : 릴레이 모듈 조도 센서 값에 맞춰 자동 제어
+        return jsonify({'result': 'light auto'})
+
+    elif order == 'light_on':
+        # Todo : 릴레이 모듈 수동 on
+        return jsonify({'result': 'light manual on'})
+
+    elif order == 'light_off':
+        # Todo : 릴레이 모듈 수동 off
+        return jsonify({'result': 'light manual off'})
 
 
 @app.route('/suspend', methods=['GET'])
@@ -90,11 +105,6 @@ if __name__ == '__main__':
     import sys
 
     sys.path.append("/home/pi/Hardware_Module/Hardware")
-    import pir_sensor
-
-    # p = Process(target=pir_sensor.sensoring, args=())
-    # p.start()
-    # x.set_proc_dic('sensoring', p)
 
     import Hardware
     hdManager = Hardware.HardwareManager()
