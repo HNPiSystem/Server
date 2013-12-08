@@ -2,6 +2,7 @@
 from multiprocessing import Process
 from flask import Flask, request, jsonify, url_for, redirect
 import NetworkManager
+import Hardware
 
 app = Flask(__name__)
 
@@ -95,5 +96,10 @@ if __name__ == '__main__':
     # p = Process(target=pir_sensor.sensoring, args=())
     # p.start()
     # x.set_proc_dic('sensoring', p)
+
+    import Hardware
+    hdManager = Hardware.HardwareManager()
+    devices = hdManager.get_status_of_devices()
+    netManager.set_devices(devices)
 
     app.run(host='0.0.0.0', port=5000, debug=True)

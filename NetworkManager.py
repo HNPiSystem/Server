@@ -29,6 +29,7 @@ class NetworkManager(object):
     password = ''
     access_token = ''
     jobs = {}
+    devices = {}
 
     def __init__(self):
         self.password = self.read_password()
@@ -102,3 +103,7 @@ class NetworkManager(object):
         if not pname == 'streaming' or pname == 'sensoring':
             self.jobs[pname].terminate()
             del self.jobs[pname]
+
+    def set_devices(self, deivces):
+        self.devices = deivces
+        print self.devices
