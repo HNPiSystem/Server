@@ -70,7 +70,7 @@ def validatePW():
 
     if password == netManager.getPassword():
         atoken = netManager.getAccessToken()
-        return jsonify({'result': '%s' % atoken, 'devices': ['camera', 'pir']})
+        return jsonify({'result': '%s' % atoken, 'devices': netManager.available_dev_list()})
     else:
         return jsonify({'result': 'Invalid Password %s' % password})
 

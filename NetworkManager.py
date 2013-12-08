@@ -29,7 +29,7 @@ class NetworkManager(object):
     password = ''
     access_token = ''
     jobs = {}
-    devices = {}
+    devices = []
 
     def __init__(self):
         self.password = self.read_password()
@@ -106,4 +106,7 @@ class NetworkManager(object):
 
     def set_devices(self, deivces):
         self.devices = deivces
-        print self.devices
+
+    def get_devices_list(self):
+        return self.devices
+
