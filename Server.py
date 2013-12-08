@@ -2,7 +2,6 @@
 from multiprocessing import Process
 from flask import Flask, request, jsonify, url_for, redirect
 import NetworkManager
-import Hardware
 
 app = Flask(__name__)
 
