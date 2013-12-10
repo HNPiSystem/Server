@@ -32,7 +32,7 @@ def ask_for_sth():
         return jsonify({'result': 'PIR Sensoring...'})
 
     elif order == 'pir_off':
-        hdManager.termniate_proc('pir')
+        hdManager.terminate_proc('pir')
         return jsonify({'result': 'PIR Sensor Off'})
 
     elif order == 'therm':
@@ -40,11 +40,11 @@ def ask_for_sth():
         return jsonify({'result': hdManager.ask_thermo_sensor()})
 
     elif order == 'light_auto_on':
-        if not hdManager.ask_light_sensor == -1:
+        if not hdManager.ask_light_sensor() == -1:
             return jsonify({'result': 'light Auto Mode'})
 
     elif order == 'light_auto_off':
-        hdManager.termniate_proc('light')
+        hdManager.terminate_proc('light')
         return jsonify({'result': 'Light Auto Off'})
 
     elif order == 'light_on':
