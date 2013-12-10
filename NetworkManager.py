@@ -28,7 +28,6 @@ class NetworkManager(object):
     """
     password = ''
     access_token = ''
-    jobs = {}
     devices = []
 
     def __init__(self):
@@ -92,17 +91,6 @@ class NetworkManager(object):
             random.choice(randstr), random.randint(1, 10), random.choice(randstr), random.randint(1, 10))
         print accesstkn
         return accesstkn
-
-    def set_proc_dic(self, pname, proc):
-        self.jobs.update({pname: proc})
-
-    def get_proc_dic(self):
-        return self.jobs
-
-    def terminate_proc(self, pname):
-        if not pname == 'streaming' or pname == 'sensoring':
-            self.jobs[pname].terminate()
-            del self.jobs[pname]
 
     def set_devices(self, deivces):
         self.devices = deivces

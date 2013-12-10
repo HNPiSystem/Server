@@ -11,11 +11,6 @@ def hello_world():
     return 'Welcome to HNPi System'
 
 
-@app.route('/index')
-def index():
-    return redirect(url_for('hello_world'))
-
-
 @app.route('/askfor', methods=['POST', 'GET'])
 def ask_for_sth():
     """
@@ -29,47 +24,48 @@ def ask_for_sth():
     order = request.args.get('order')
 
     if order == 'movie':
-        p = Process(target=hdManager.ask_streaming(), args=())
-        p.start()
-        p2 = Process(target=hdManager.ask_pir_sensor(), args=())
-        p2.start()
-        # netManager.set_proc_dic('streaming', p2)
+        hdManager.ask_streaming()
         import get_ip
 
         return jsonify({'result': 'rtsp://' + get_ip.get_ip_address('eth0') + ':8554/'})
+
+    elif order == 'pir_on':
+        hdManager.ask_pir_sensor()
+        return jsonify({'result': 'PIR Sensoring...'})
+
+    elif order == 'pir_off':
+        hdManager.termniate_proc('pir')
+        return jsonify({'result': 'PIR Sensor Off'})
 
     elif order == 'therm':
         # 현재 온도 체크해서 보내 줌.
         return jsonify({'result': hdManager.ask_thermo_sensor()})
 
-    elif order == 'light_auto':
-        # Todo : 릴레이 모듈 조도 센서 값에 맞춰 자동 제어
-        return jsonify({'result': 'light auto'})
+    elif order == 'light_auto_on':
+        if not hdManager.ask_light_relay_auto == -1:
+            return jsonify({'result': 'light Auto Mode'})
+
+    elif order == 'light_auto_off':
+        hdManager.termniate_proc('light')
+        return jsonify({'result': 'Light Auto Off'})
 
     elif order == 'light_on':
-        # Todo : 릴레이 모듈 수동 on
-        return jsonify({'result': 'light manual on'})
+        result = hdManager.ask_light_relay_on()
+        if result == 'True':
+            return jsonify({'result': 'Turned On'})
+        elif result == 'False':
+            return jsonify({'result': 'Error : Not turned on'})
+        else:
+            return jsonify({'result': 'System Error'})
 
     elif order == 'light_off':
-        # Todo : 릴레이 모듈 수동 off
-        return jsonify({'result': 'light manual off'})
-
-
-@app.route('/suspend', methods=['GET'])
-def suspend_sth():
-    access_token = request.args.get('accessToken')
-    if not netManager.is_valid_token(access_token):
-        return jsonify({'result': 'you have invalid access token'})
-
-    order = request.args.get('order')
-    if order == 'sensor' and 'sensor' in netManager.get_proc_dic():
-        netManager.terminate_proc('sensor')
-        return jsonify({'result': 'Sensoring suspended'})
-    elif order == 'streaming' and 'streaming' in netManager.get_proc_dic():
-        netManager.terminate_proc('streaming')
-        return jsonify({'result': 'Streaming suspended'})
-    else:
-        return jsonify({'result': 'Invalid request'})
+        result = hdManager.ask_light_relay_off()
+        if result == 'True':
+            return jsonify({'result': 'Turned Off'})
+        elif result == 'False':
+            return jsonify({'result': 'Error : Not turned off'})
+        else:
+            return jsonify({'result': 'System Error'})
 
 
 @app.route('/login', methods=['POST', 'GET'])
