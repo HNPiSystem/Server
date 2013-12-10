@@ -25,9 +25,7 @@ def ask_for_sth():
 
     if order == 'movie':
         hdManager.ask_streaming()
-        import get_ip
-
-        return jsonify({'result': 'rtsp://' + get_ip.get_ip_address('eth0') + ':8554/'})
+        return jsonify({'result': 'rtsp://119.197.164.6:8554/'})
 
     elif order == 'pir_on':
         hdManager.ask_pir_sensor()
@@ -42,7 +40,7 @@ def ask_for_sth():
         return jsonify({'result': hdManager.ask_thermo_sensor()})
 
     elif order == 'light_auto_on':
-        if not hdManager.ask_light_relay_auto == -1:
+        if not hdManager.ask_light_sensor == -1:
             return jsonify({'result': 'light Auto Mode'})
 
     elif order == 'light_auto_off':
