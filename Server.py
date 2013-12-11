@@ -3,6 +3,8 @@ from multiprocessing import Process
 from flask import Flask, request, jsonify, url_for, redirect
 import NetworkManager
 
+exe_flag = -1
+
 app = Flask(__name__)
 
 # Login with password
@@ -17,6 +19,9 @@ def ask_for_sth():
     클라이언트에서 받은 요청에 따라 명령 수행.
     :return: image path or stream address
     """
+
+    global exe_flag
+
     access_token = request.args.get('accessToken')
     if not netManager.is_valid_token(access_token):
         return jsonify({'result': 'you have invalid access token'})
@@ -24,8 +29,14 @@ def ask_for_sth():
     order = request.args.get('order')
 
     if order == 'movie':
-        hdManager.ask_streaming()
-        return jsonify({'result': 'rtsp://119.197.164.6:8554/'})
+	print exe_flag
+	#if exe_flag == -1:
+	#	import camera
+	hdManager.ask_streaming()
+	#	P1 = Process(target=camera.view_stream, args=())
+	#	P1.start()
+	#	exe_flag = 1
+	return jsonify({'result': 'rtsp://119.197.164.6:8554/'})
 
     elif order == 'pir_on':
         hdManager.ask_pir_sensor()
@@ -41,7 +52,7 @@ def ask_for_sth():
 
     elif order == 'light_auto_on':
         if not hdManager.ask_light_sensor() == -1:
-            return jsonify({'result': 'light Auto Mode'})
+            return jsonify({'result': 'Light Auto Mode'})
 
     elif order == 'light_auto_off':
         hdManager.terminate_proc('light')
@@ -78,7 +89,9 @@ def validatePW():
 
     if password == netManager.getPassword():
         atoken = netManager.getAccessToken()
-        return jsonify({'result': '%s' % atoken, 'devices': netManager.available_dev_list()})
+	devices = hdManager.get_status_of_devices()
+	print devices
+        return jsonify({'result': '%s' % atoken, 'devices': devices})
     else:
         return jsonify({'result': 'Invalid Password %s' % password})
 
