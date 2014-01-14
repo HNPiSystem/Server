@@ -2,6 +2,12 @@ import random
 
 
 def singleton(class_):
+    """
+    methods to apply singleton pattern.
+    :param class_: class
+    :return: class
+    """
+
     class class_w(class_):
         _instance = None
 
@@ -39,9 +45,17 @@ class NetworkManager(object):
         print cls.__name__
 
     def getPassword(self):
+        """
+        method to get server password.
+        :return: password
+        """
         return self.password
 
     def getAccessToken(self):
+        """
+        method to get access token.
+        :return: access token
+        """
         return self.access_token
 
     def is_valid_token(self, atoken):
@@ -56,12 +70,20 @@ class NetworkManager(object):
             return False
 
     def write_password(self, pw):
+        """
+        method to apply new password.
+        :param pw: a new password
+        """
         f = file('dat', 'w+')
         f.write(pw)
         self.password = pw
         f.close()
 
     def read_password(self):
+        """
+        method to read password in file.
+        :return: an encrypted password
+        """
         f = file('dat')
         s = f.read(32)
         f.close()
@@ -93,8 +115,16 @@ class NetworkManager(object):
         return accesstkn
 
     def set_devices(self, deivces):
+        """
+        method to set available devices list.
+        :param deivces: available devices list.
+        """
         self.devices = deivces
 
     def get_devices_list(self):
+        """
+        method to get devices list.
+        :return: devices list
+        """
         return self.devices
 
